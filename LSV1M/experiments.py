@@ -5,6 +5,27 @@ from mozaik.sheets.population_selector import RCRandomPercentage
 from parameters import ParameterSet
 
 
+def create_experiment_of_NaturalImages(model, num_skipped_images, num_images, num_trials, **args):
+    return [
+        NoStimulation(model, ParameterSet({"duration": 270})),
+        # Measure response to sequence of static natural images
+        MeasureNaturalImages(
+            model,
+            ParameterSet(
+                {
+                    "duration": 560,
+                    "images_dir": "/projects/ImageDatasets/imagenet/all_imagenet_images",
+                    "num_images": num_images,
+                    "image_display_duration": 560.0,
+                    "num_trials": num_trials,
+                    "num_skipped_images": num_skipped_images,
+                    "size": 11,
+                    'shuffle_stimuli': True, 
+                }
+            ),
+        ),
+    ]
+
 def create_experiments(model):
 
     return [

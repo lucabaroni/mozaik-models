@@ -1,0 +1,7 @@
+{
+      "1": {
+        "component": "mozaik.sheets.population_selector.RCAll",
+        "variables": ("spikes"),
+        "params": {}
+    },
+}
