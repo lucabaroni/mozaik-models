@@ -72,11 +72,10 @@ def get_sheetname(sheet):
 
 #%%
 # run export
+path = sys.argv[1]
+sheet = sys.argv[2]
+base_path = sys.argv[3]
 
-# path = sys.argv[1]
-# sheet = sys.argv[2]
-sheet = 'V1_Exc_L2/3'
-path = '/CSNG/baroni/mozaik-models/LSV1M/20240116-093251[param_nat_img.defaults]CombinationParamSearch{trial:[0],baseline:[0]}/NewDataset_Images_from_0_to_100_ParameterSearch_____baseline:0_trial:0'
 datastore = get_datastore(path)
 
 dsv = param_filter_query(datastore, st_name='NaturalImage')
@@ -89,52 +88,55 @@ img_paths =  sorted(list(set(MozaikParametrized.idd(s).image_path for s in dsv.g
 setup_logging()
 logger = mozaik.getMozaikLogger()
 
-if len(trials) == 1:
-    print(f'There is a single trial')
-    dsv1 = param_filter_query(dsv, sheet_name = sheet)
-    for trial in trials:
-        dsv2 = param_filter_query(dsv1, st_trial = trial)
-        segs = dsv2.get_segments()
-        for seg in tqdm(segs):
-            stim = MozaikParametrized.idd(seg.annotations['stimulus'])
-            
-            img_number = stim.image_path.split('/')[-1].split('_')[0]
-            resp_path = os.path.join('/CSNG/baroni/test/', 'single_trial', img_number)
-            
-            resp = seg.mean_rates()
-
-            gc.collect()
-            
+dsv1 = param_filter_query(dsv, sheet_name = sheet)
+for trial in trials:
+    dsv2 = param_filter_query(dsv1, st_trial = trial)
+    segs = dsv2.get_segments()
+    for seg in tqdm(segs):
+        stim = MozaikParametrized.idd(seg.annotations['stimulus'])
+        img_number = stim.image_path.split('/')[-1].split('_')[0]
+        resp = seg.mean_rates()
+        gc.collect()
+        if len(trials) == 1:
+            print(f'There is a single trial')
+            print(f'sheet={sheet}')
+            resp_path = os.path.join(base_path, 'single_trial', img_number)
             os.makedirs(resp_path, exist_ok=True)
             np.save(os.path.join(resp_path, get_sheetname(sheet) +'.npy'), resp)
+        if len(trials) != 1:
+            print(f'There are multiple trials')
+            print(f'sheet={sheet}')
+            resp_path = os.path.join(base_path, 'multitrial', img_number)
+            resp_path_trial = os.path.join(base_path, 'multitrial', img_number, 'trial='+str(trial))
+            os.makedirs(resp_path_trial, exist_ok=True)
+            np.save(os.path.join(resp_path_trial, get_sheetname(sheet) +'.npy'), resp)
+        if sheet == sheets[0]:
             if trial == 0:
-                if sheet == sheets[0]:
-                    img = reconstruct_stimuli(stim)
-                    np.save(os.path.join(resp_path, 'stimulus' +'.npy'), img)
-                    gc.collect()
+                img = reconstruct_stimuli(stim)
+                np.save(os.path.join(resp_path, 'stimulus' +'.npy'), img)
+                gc.collect()
 
 
-            
-            # stims = dsv2.get_stimuli()
-            # stims_n = [MozaikParametrized.idd(st).image_path.split('/')[-1].split('_')[0] for st in stims]
+# if len(trials) == 1:
+#     print(f'There is a single trial')
+#     print(f'sheet={sheet}')
+#     dsv1 = param_filter_query(dsv, sheet_name = sheet)
+#     for trial in trials:
+#         dsv2 = param_filter_query(dsv1, st_trial = trial)
+#         segs = dsv2.get_segments()
+#         for seg in tqdm(segs):
+#             stim = MozaikParametrized.idd(seg.annotations['stimulus'])
+#             img_number = stim.image_path.split('/')[-1].split('_')[0]
+#             resp_path = os.path.join(base_path, 'single_trial', img_number)
+#             resp = seg.mean_rates()
+#             gc.collect()
+#             os.makedirs(resp_path, exist_ok=True)
+#             np.save(os.path.join(resp_path, get_sheetname(sheet) +'.npy'), resp)
+#             if sheet == sheets[0]:
+#                 img = reconstruct_stimuli(stim)
+#                 np.save(os.path.join(resp_path, 'stimulus' +'.npy'), img)
+#                 gc.collect()
 
-            # # needs to be fixed
-            # segs = [seg for _, seg in sorted(zip(stims_n, segs))]
-            
-            # gc.collect()
-            # resps = [s.mean_rates() for s in tqdm(segs)]
-            # gc.collect()
-            # for i, stim in enumerate(tqdm(stims)):
-            #     parametrized_stim = MozaikParametrized.idd(stim)
-            #     img_number = parametrized_stim.image_path.split('/')[-1].split('_')[0]
-            #     resp_path = os.path.join('/CSNG/baroni/test/', 'single_trial', img_number)
-            #     os.makedirs(resp_path, exist_ok=True)
-            #     np.save(os.path.join(resp_path, sf +'.npy'), resps[i])
-            #     if trial ==0:
-            #         if sheet == sheets[0]:
-            #             img = reconstruct_stimuli(parametrized_stim)
-            #             np.save(os.path.join(resp_path, 'stimulus' +'.npy'), img)
-            #             gc.collect()
 
 # if len(trials) != 1:
 #     print(f'There are multiple trials ({len(trials)})')
