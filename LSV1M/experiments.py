@@ -5,16 +5,30 @@ from mozaik.sheets.population_selector import RCRandomPercentage
 from parameters import ParameterSet
 
 
-def create_experiment_of_NaturalImages(model, num_skipped_images, num_images, num_trials, **args):
+def create_experiment_of_StaticImages(model, experiment_parameters):
+    images_dir = experiment_parameters['images_dir']
+    num_images = experiment_parameters['num_images']
+    num_trials = experiment_parameters['num_trials']
+    num_skipped_images = experiment_parameters['num_skipped_images']    
+
+    if images_dir is 0:
+        images_dir = "/projects/ImageDatasets/imagenet/all_imagenet_images"
+    if images_dir is 1:
+        images_dir = "/CSNG/baroni/mozaik-models/Images/gratings"
+    if images_dir is 2:
+        images_dir = "/CSNG/baroni/mozaik-models/Images/MNIST_220x220"
+    if images_dir is 'imagenet':
+        images_dir = "/projects/ImageDatasets/imagenet/all_imagenet_images"
+
     return [
         NoStimulation(model, ParameterSet({"duration": 270})),
         # Measure response to sequence of static natural images
-        MeasureNaturalImages(
+        MeasureStaticImages(
             model,
             ParameterSet(
                 {
                     "duration": 560,
-                    "images_dir": "/projects/ImageDatasets/imagenet/all_imagenet_images",
+                    "images_dir": images_dir,
                     "num_images": num_images,
                     "image_display_duration": 560.0,
                     "num_trials": num_trials,
@@ -27,7 +41,6 @@ def create_experiment_of_NaturalImages(model, num_skipped_images, num_images, nu
     ]
 
 def create_experiments(model):
-
     return [
         # Lets kick the network up into activation
 
@@ -43,6 +56,70 @@ def create_experiments(model):
         MeasureNaturalImagesWithEyeMovement(model, ParameterSet(
             {'stimulus_duration': 2*143*7, 'num_trials': 10, 'size':30, 'shuffle_stimuli': False})),
     ]
+
+def create_experiment_of_gratings(model, num_skipped_images, num_images, num_trials, **args):
+    return [
+        NoStimulation(model, ParameterSet({"duration": 270})),
+        # Measure response to sequence of static natural images
+        MeasureNaturalImages(
+            model,
+            ParameterSet(
+                {
+                    "duration": 560,
+                    "images_dir": "/CSNG/baroni/mozaik-models/Images/gratings/",
+                    "num_images": num_images,
+                    "image_display_duration": 560.0,
+                    "num_trials": num_trials,
+                    "num_skipped_images": num_skipped_images,
+                    "size": 11,
+                    'shuffle_stimuli': True, 
+                }
+            ),
+        ),
+    ]
+
+def create_experiment_of_gratings_modified(model, num_skipped_images, num_images, num_trials, **args):
+    return [
+        NoStimulation(model, ParameterSet({"duration": 270})),
+        # Measure response to sequence of static natural images
+        MeasureNaturalImages(
+            model,
+            ParameterSet(
+                {
+                    "duration": 560,
+                    "images_dir": "/CSNG/baroni/mozaik-models/Images/gratings_modified/",
+                    "num_images": num_images,
+                    "image_display_duration": 560.0,
+                    "num_trials": num_trials,
+                    "num_skipped_images": num_skipped_images,
+                    "size": 11,
+                    'shuffle_stimuli': True, 
+                }
+            ),
+        ),
+    ]
+
+def create_experiment_of_mnist(model, num_skipped_images, num_images, num_trials, **args):
+    return [
+        NoStimulation(model, ParameterSet({"duration": 270})),
+        # Measure response to sequence of static natural images
+        MeasureNaturalImages(
+            model,
+            ParameterSet(
+                {
+                    "duration": 560,
+                    "images_dir": "/CSNG/baroni/mozaik-models/Images/MNIST_220x220",
+                    "num_images": num_images,
+                    "image_display_duration": 560.0,
+                    "num_trials": num_trials,
+                    "num_skipped_images": num_skipped_images,
+                    "size": 11,
+                    'shuffle_stimuli': True, 
+                }
+            ),
+        ),
+    ]
+
 
 
 def create_experiments_stc(model):
