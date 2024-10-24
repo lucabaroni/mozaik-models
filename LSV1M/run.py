@@ -32,5 +32,6 @@ data_store, model = run_workflow(
 )
 
 data_store.save()
+
 export_from_datastore_to_H5py(data_store=data_store, st_name='NaturalImages', data_type='mean_rates')
-### export responses
+
