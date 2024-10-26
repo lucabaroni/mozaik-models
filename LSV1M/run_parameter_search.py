@@ -5,7 +5,7 @@ import numpy as np
 
 if True:
     start_image = 50000
-    end_image = 56000
+    end_image = 50100
     experiment_images_dir = [0]
     experiment_num_images = [100]
     experiment_num_trials = [1]
@@ -19,11 +19,11 @@ if True:
                 "--hint=nomultithread",
                 "-J NaturalImages",
                 "-N 1-1",
-                "-x w[4-12, 16-17]",
+                # "-x w[4-12, 16-17]",
                 # "--exclusive"
             ],
         ),
-        {"trial": [0], 
+        {
          "experiments.images_dir": experiment_images_dir,
          "experiments.num_skipped_images": experiment_num_skipped_images, 
          "experiments.num_images": experiment_num_images, 
